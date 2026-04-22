@@ -20,6 +20,20 @@ export default function App() {
   const [currentSelection, setCurrentSelection] = useState<CardSelection | null>(null);
   const [isModeSelection, setIsModeSelection] = useState(true);
   
+  // Load card from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('scratch_selected_card');
+    if (saved) {
+      try {
+        const card = JSON.parse(saved);
+        setSelectedCard(card);
+        setIsModeSelection(false);
+      } catch (e) {
+        console.error("Error loading saved card", e);
+      }
+    }
+  }, []);
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const touchStartRef = useRef<{ x: number, y: number, value: CardValue, suit: Suit } | null>(null);
@@ -170,6 +184,7 @@ export default function App() {
     if (isModeSelection && currentSelection) {
       setSelectedCard(currentSelection);
       setIsModeSelection(false);
+      localStorage.setItem('scratch_selected_card', JSON.stringify(currentSelection));
     }
     setCurrentSelection(null);
     touchStartRef.current = null;
@@ -179,6 +194,7 @@ export default function App() {
     e.stopPropagation();
     setSelectedCard(null);
     setIsModeSelection(true);
+    localStorage.removeItem('scratch_selected_card');
   };
 
   const suitEmoji = (suit: Suit) => {
@@ -264,18 +280,19 @@ export default function App() {
           </div>
         ))}
 
-        <div className="relative z-20 flex-grow flex flex-col items-center justify-center space-y-4 sm:space-y-8 py-8 sm:py-16 px-4 text-center select-none">
+        <div className="relative z-20 flex-grow flex flex-col items-center justify-center space-y-10 sm:space-y-16 py-12 px-4 text-center select-none">
           <div className="w-full">
-            <h1 className="text-[14vw] sm:text-[80px] font-serif font-black leading-none tracking-tighter uppercase text-gold-gradient drop-shadow-2xl">
-              GIOCA<br /><span className="text-[10vw] sm:text-[50px] italic lowercase normal-case tracking-tighter">e</span><br />VINCI!
+            <h1 className="text-[11vw] sm:text-[65px] font-serif font-black leading-none tracking-tighter uppercase text-gold-gradient drop-shadow-2xl">
+              GIOCA e VINCI!
             </h1>
           </div>
-          <div className="w-full">
-            <div className="h-[2px] sm:h-[3px] w-full bg-gradient-to-r from-transparent via-gold to-transparent mb-2 sm:mb-4" />
-            <h2 className="text-[7vw] sm:text-[40px] font-serif font-black uppercase tracking-tight text-gold-gradient drop-shadow-md px-4">
-              TROVA LA CARTA FORTUNATA!
+          
+          <div className="w-full flex flex-col items-center max-w-lg mx-auto">
+            <div className="h-[2px] sm:h-[3px] w-full bg-gradient-to-r from-transparent via-gold to-transparent mb-8" />
+            <h2 className="text-[10vw] sm:text-[60px] font-serif font-black uppercase tracking-tight text-gold-gradient drop-shadow-md px-4 leading-[1.1]">
+              TROVA LA CARTA<br/>FORTUNATA!
             </h2>
-            <div className="h-[2px] sm:h-[3px] w-full bg-gradient-to-r from-transparent via-gold to-transparent mt-2 sm:mt-4" />
+            <div className="h-[2px] sm:h-[3px] w-full bg-gradient-to-r from-transparent via-gold to-transparent mt-8" />
           </div>
         </div>
 
@@ -287,58 +304,53 @@ export default function App() {
 
       <canvas ref={canvasRef} className="hidden pointer-events-none" />
 
-      {/* Selection Grids Overlay (Only active/visible during selection mode) */}
+      {/* Selection Grids Overlay (Only active during selection mode - COMPLETELY INVISIBLE) */}
       {isModeSelection && (
         <div className="absolute inset-0 z-40 pointer-events-none">
           {/* Top 1x2 Grid */}
-          <div className="absolute top-0 left-0 right-0 h-16 border-[0.5px] border-white/20 pointer-events-none bg-black/10">
+          <div className="absolute top-0 left-0 right-0 h-16 pointer-events-none">
             <div className="grid grid-cols-2 h-full w-full">
               {[{v:'K', s:'H' as Suit, l:'K ♥'}, {v:'K', s:'D' as Suit, l:'K ♦'}].map((card, i) => (
                 <button 
                   key={`top-${i}`}
-                  className="border-[0.5px] border-white/20 pointer-events-auto flex items-center justify-center text-3xl font-serif font-black text-white bg-white/5 active:bg-white/20 transition-colors"
+                  className="pointer-events-auto w-full h-full border-none bg-transparent active:bg-white/5 transition-colors"
                   onTouchStart={(e) => onSelectionStart(card.v as CardValue, card.s, e.touches[0].clientX, e.touches[0].clientY)}
                   onMouseDown={(e) => onSelectionStart(card.v as CardValue, card.s, e.clientX, e.clientY)}
-                >
-                  {card.l}
-                </button>
+                />
               ))}
             </div>
           </div>
 
-          <div className="absolute top-16 left-0 right-0 bottom-16 border-[0.5px] border-white/20 pointer-events-none bg-black/10">
+          <div className="absolute top-16 left-0 right-0 bottom-16 pointer-events-none">
             <div className="grid grid-cols-3 grid-rows-4 h-full w-full">
               {['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q'].map((val, i) => (
                 <button 
                   key={i}
-                  className="border-[0.5px] border-white/20 pointer-events-auto flex items-center justify-center text-3xl font-serif font-black text-white/40 bg-white/5 active:bg-white/20 transition-colors"
+                  className="pointer-events-auto w-full h-full border-none bg-transparent active:bg-white/5 transition-colors"
                   onTouchStart={(e) => onSelectionStart(val as CardValue, 'H', e.touches[0].clientX, e.touches[0].clientY)}
                   onMouseDown={(e) => onSelectionStart(val as CardValue, 'H', e.clientX, e.clientY)}
-                >
-                  {val}
-                </button>
+                />
               ))}
             </div>
           </div>
 
-          <div className="absolute bottom-0 left-0 right-0 h-16 border-[0.5px] border-white/20 pointer-events-none bg-black/10">
+          <div className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none">
             <div className="grid grid-cols-2 h-full w-full">
               {[{v:'K', s:'S' as Suit, l:'K ♠'}, {v:'K', s:'C' as Suit, l:'K ♣'}].map((card, i) => (
                 <button 
                   key={`bottom-${i}`}
-                  className="border-[0.5px] border-white/20 pointer-events-auto flex items-center justify-center text-3xl font-serif font-black text-white bg-white/5 active:bg-white/20 transition-colors"
+                  className="pointer-events-auto w-full h-full border-none bg-transparent active:bg-white/5 transition-colors"
                   onTouchStart={(e) => onSelectionStart(card.v as CardValue, card.s, e.touches[0].clientX, e.touches[0].clientY)}
                   onMouseDown={(e) => onSelectionStart(card.v as CardValue, card.s, e.clientX, e.clientY)}
-                >
-                  {card.l}
-                </button>
+                />
               ))}
             </div>
           </div>
         </div>
       )}
 
-      {/* Floating Selection Preview */}
+      {/* Floating Selection Preview - HIDDEN as per user request for secrecy */}
+      {/* 
       {currentSelection && (
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-black/90 px-8 py-6 rounded-3xl border-4 border-gold shadow-2xl flex flex-col items-center pointer-events-none scale-110">
           <span className="text-7xl font-serif font-black text-white mb-2">{currentSelection.value}</span>
@@ -348,6 +360,7 @@ export default function App() {
           <div className="mt-4 text-xs text-gold uppercase tracking-widest font-bold opacity-50 font-sans">Seme Selezionato</div>
         </div>
       )}
+      */}
     </div>
   );
 }
