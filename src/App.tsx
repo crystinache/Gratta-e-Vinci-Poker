@@ -196,7 +196,7 @@ export default function App() {
 
   return (
     <div 
-      className="h-screen w-screen bg-page-bg overflow-hidden flex flex-col items-stretch justify-stretch select-none touch-none"
+      className="h-[100dvh] w-screen bg-page-bg overflow-hidden flex flex-col items-stretch justify-stretch select-none touch-none"
       onMouseDown={handleScratchStart}
       onMouseMove={handleScratchMove}
       onMouseUp={handleScratchEnd}
@@ -207,9 +207,9 @@ export default function App() {
     >
       
       {/* Background Layer: The Selected Card & Reset Zones */}
-      <div className="absolute inset-0 flex items-center justify-center bg-neutral-900 z-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 flex items-center justify-center bg-neutral-900 z-0 overflow-hidden pointer-events-none p-4">
         {selectedCard ? (
-          <div className="relative h-[78%] max-h-[85vh] aspect-[2/3] w-auto pointer-events-none">
+          <div className="relative h-[78%] max-h-[85vh] aspect-[2/3] w-auto max-w-full pointer-events-none">
              <motion.img 
               key={`${selectedCard.value}${selectedCard.suit}`}
               initial={{ scale: 0.9, opacity: 0 }}
@@ -264,18 +264,18 @@ export default function App() {
           </div>
         ))}
 
-        <div className="relative z-20 flex-grow flex flex-col items-center justify-center space-y-8 py-16 px-6 text-center select-none">
+        <div className="relative z-20 flex-grow flex flex-col items-center justify-center space-y-4 sm:space-y-8 py-8 sm:py-16 px-4 text-center select-none">
           <div className="w-full">
-            <h1 className="text-[18vw] sm:text-[80px] font-serif font-black leading-none tracking-tighter uppercase text-gold-gradient drop-shadow-2xl">
-              GIOCA<br /><span className="text-[12vw] sm:text-[50px] italic lowercase normal-case tracking-tighter">e</span><br />VINCI!
+            <h1 className="text-[14vw] sm:text-[80px] font-serif font-black leading-none tracking-tighter uppercase text-gold-gradient drop-shadow-2xl">
+              GIOCA<br /><span className="text-[10vw] sm:text-[50px] italic lowercase normal-case tracking-tighter">e</span><br />VINCI!
             </h1>
           </div>
           <div className="w-full">
-            <div className="h-[3px] w-full bg-gradient-to-r from-transparent via-gold to-transparent mb-4" />
-            <h2 className="text-[10vw] sm:text-[40px] font-serif font-black uppercase tracking-tight text-gold-gradient drop-shadow-md px-4">
+            <div className="h-[2px] sm:h-[3px] w-full bg-gradient-to-r from-transparent via-gold to-transparent mb-2 sm:mb-4" />
+            <h2 className="text-[7vw] sm:text-[40px] font-serif font-black uppercase tracking-tight text-gold-gradient drop-shadow-md px-4">
               TROVA LA CARTA FORTUNATA!
             </h2>
-            <div className="h-[3px] w-full bg-gradient-to-r from-transparent via-gold to-transparent mt-4" />
+            <div className="h-[2px] sm:h-[3px] w-full bg-gradient-to-r from-transparent via-gold to-transparent mt-2 sm:mt-4" />
           </div>
         </div>
 
