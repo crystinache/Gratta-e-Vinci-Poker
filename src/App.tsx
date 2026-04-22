@@ -24,7 +24,6 @@ export default function App() {
   const containerRef = useRef<HTMLDivElement>(null);
   const touchStartRef = useRef<{ x: number, y: number, value: CardValue, suit: Suit } | null>(null);
   const lastPointRef = useRef<{ x: number, y: number } | null>(null);
-  const resetTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Deck of cards API URL generator
   const getCardImageUrl = (card: CardSelection) => {
@@ -176,22 +175,10 @@ export default function App() {
     touchStartRef.current = null;
   };
 
-  const startResetTimer = (e: React.PointerEvent) => {
+  const handleReset = (e: React.MouseEvent | React.TouchEvent) => {
     e.stopPropagation();
-    // Clear any existing timer just in case
-    if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
-    resetTimerRef.current = setTimeout(() => {
-      setSelectedCard(null);
-      setIsModeSelection(true);
-      resetTimerRef.current = null;
-    }, 1000);
-  };
-
-  const clearResetTimer = () => {
-    if (resetTimerRef.current) {
-      clearTimeout(resetTimerRef.current);
-      resetTimerRef.current = null;
-    }
+    setSelectedCard(null);
+    setIsModeSelection(true);
   };
 
   const suitEmoji = (suit: Suit) => {
@@ -222,7 +209,7 @@ export default function App() {
       {/* Background Layer: The Selected Card & Reset Zones */}
       <div className="absolute inset-0 flex items-center justify-center bg-neutral-900 z-0 overflow-hidden pointer-events-none">
         {selectedCard ? (
-          <div className="relative h-[85%] max-h-[90vh] aspect-[2/3] w-auto pointer-events-none">
+          <div className="relative h-[78%] max-h-[85vh] aspect-[2/3] w-auto pointer-events-none">
              <motion.img 
               key={`${selectedCard.value}${selectedCard.suit}`}
               initial={{ scale: 0.9, opacity: 0 }}
@@ -236,15 +223,11 @@ export default function App() {
             <div className="absolute inset-0 z-50 pointer-events-none">
               <div 
                 className="absolute top-0 left-0 w-[25%] h-[20%] pointer-events-auto cursor-pointer"
-                onPointerDown={startResetTimer}
-                onPointerUp={clearResetTimer}
-                onPointerLeave={clearResetTimer}
+                onDoubleClick={handleReset}
               />
               <div 
                 className="absolute bottom-0 right-0 w-[25%] h-[20%] pointer-events-auto cursor-pointer"
-                onPointerDown={startResetTimer}
-                onPointerUp={clearResetTimer}
-                onPointerLeave={clearResetTimer}
+                onDoubleClick={handleReset}
               />
             </div>
           </div>

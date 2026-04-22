@@ -1,8 +1,7 @@
 {
-  "name": "react-example",
+  "name": "gratta-e-vinci-poker",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "description": "Digital Scratch Card Poker Game with secretive card selection and realistic scratch effects.",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build": "vite build",
