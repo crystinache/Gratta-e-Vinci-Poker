@@ -192,6 +192,41 @@ export default function App() {
 
   const handleReset = (e: React.MouseEvent | React.TouchEvent) => {
     e.stopPropagation();
+    
+    // Only allow reset if the card area is actually scratched (transparent on canvas)
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const rect = canvas.getBoundingClientRect();
+      let clientX, clientY;
+      
+      if ('clientX' in e) {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      } else {
+        // Handle touch tap (using the last point or the event location if available)
+        const touch = (e as any).changedTouches?.[0] || (e as any).touches?.[0];
+        if (touch) {
+          clientX = touch.clientX;
+          clientY = touch.clientY;
+        }
+      }
+
+      if (clientX !== undefined && clientY !== undefined) {
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        
+        if (ctx) {
+          const pixel = ctx.getImageData(x, y, 1, 1).data;
+          // Alpha channel is at index 3. 0 = transparent (scratched), 255 = opaque (covered)
+          if (pixel[3] > 128) {
+            // Still significantly covered, ignore reset
+            return;
+          }
+        }
+      }
+    }
+
     setSelectedCard(null);
     setIsModeSelection(true);
     localStorage.removeItem('scratch_selected_card');
