@@ -15,11 +15,64 @@ interface CardSelection {
   suit: Suit;
 }
 
+const TRANSLATIONS: Record<string, { play: string, and: string, win: string, findCard: [string, string], chooseDestiny: string }> = {
+  it: {
+    play: "GIOCA",
+    and: "E",
+    win: "VINCI!",
+    findCard: ["TROVA LA CARTA", "FORTUNATA!"],
+    chooseDestiny: "Scegli il tuo destino..."
+  },
+  en: {
+    play: "PLAY",
+    and: "AND",
+    win: "WIN!",
+    findCard: ["FIND THE LUCKY", "CARD!"],
+    chooseDestiny: "Choose your destiny..."
+  },
+  es: {
+    play: "JUEGA",
+    and: "Y",
+    win: "¡GANA!",
+    findCard: ["¡ENCUENTRA LA", "CARTA DE LA SUERTE!"],
+    chooseDestiny: "Elige tu destino..."
+  },
+  fr: {
+    play: "JOUEZ",
+    and: "ET",
+    win: "GAGNEZ!",
+    findCard: ["TROUVEZ LA CARTE", "DE CHANCE!"],
+    chooseDestiny: "Choisissez votre destin..."
+  },
+  de: {
+    play: "SPIELEN",
+    and: "UND",
+    win: "GEWINNEN!",
+    findCard: ["FINDE DIE", "GLÜCKSKARTE!"],
+    chooseDestiny: "Wähle dein Schicksal..."
+  },
+  ro: {
+    play: "JOACĂ",
+    and: "ȘI",
+    win: "CÂȘTIGĂ!",
+    findCard: ["GĂSEȘTE CARTEA", "NOROCOASĂ!"],
+    chooseDestiny: "Alege-ți destinul..."
+  }
+};
+
 export default function App() {
   const [selectedCard, setSelectedCard] = useState<CardSelection | null>(null);
   const [currentSelection, setCurrentSelection] = useState<CardSelection | null>(null);
   const [isModeSelection, setIsModeSelection] = useState(true);
+  const [lang, setLang] = useState('en');
+
+  // Detect language on mount
+  useEffect(() => {
+    const userLang = navigator.language.split('-')[0];
+    setLang(TRANSLATIONS[userLang] ? userLang : 'en');
+  }, []);
   
+  const t = TRANSLATIONS[lang];
   // Load card from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem('scratch_selected_card');
@@ -284,7 +337,7 @@ export default function App() {
           </div>
         ) : (
           <div className="text-white/10 font-serif italic text-2xl px-12 text-center heartbeat">
-            {isModeSelection ? "Scegli il tuo destino..." : ""}
+            {isModeSelection ? t.chooseDestiny : ""}
           </div>
         )}
       </div>
@@ -315,19 +368,21 @@ export default function App() {
           </div>
         ))}
 
-        <div className="relative z-20 flex-grow flex flex-col items-center justify-center space-y-10 sm:space-y-16 py-12 px-4 text-center select-none">
+        <div className="relative z-20 flex-grow flex flex-col items-center justify-center space-y-8 sm:space-y-12 py-12 px-4 text-center select-none">
           <div className="w-full">
-            <h1 className="text-[11vw] sm:text-[65px] font-serif font-black leading-none tracking-tighter uppercase text-gold-gradient drop-shadow-2xl">
-              GIOCA e VINCI!
+            <h1 className="text-[14vw] sm:text-[75px] font-serif font-black leading-[0.9] tracking-tighter uppercase text-gold-gradient drop-shadow-2xl">
+              {t.play}<br/>
+              <span className="text-[10vw] sm:text-[50px]">{t.and}</span><br/>
+              {t.win}
             </h1>
           </div>
           
           <div className="w-full flex flex-col items-center max-w-lg mx-auto">
-            <div className="h-[2px] sm:h-[3px] w-full bg-gradient-to-r from-transparent via-gold to-transparent mb-8" />
+            <div className="h-[2px] sm:h-[3px] w-full bg-gradient-to-r from-transparent via-gold to-transparent mb-6" />
             <h2 className="text-[10vw] sm:text-[60px] font-serif font-black uppercase tracking-tight text-gold-gradient drop-shadow-md px-4 leading-[1.1]">
-              TROVA LA CARTA<br/>FORTUNATA!
+              {t.findCard[0]}<br/>{t.findCard[1]}
             </h2>
-            <div className="h-[2px] sm:h-[3px] w-full bg-gradient-to-r from-transparent via-gold to-transparent mt-8" />
+            <div className="h-[2px] sm:h-[3px] w-full bg-gradient-to-r from-transparent via-gold to-transparent mt-6" />
           </div>
         </div>
 
