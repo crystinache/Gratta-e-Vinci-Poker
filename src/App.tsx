@@ -208,13 +208,32 @@ export default function App() {
   // Selections Handlers
   const onSelectionStart = (value: CardValue, initialSuit: Suit, x: number, y: number) => {
     if (!isModeSelection) return;
-    touchStartRef.current = { x, y, value, suit: initialSuit };
-    setCurrentSelection({ value, suit: initialSuit });
+    
+    let defaultSuit: Suit = initialSuit;
+    
+    // Override default suit based on value for buttons in the main grid
+    // Kings have their suit passed from initialSuit based on the button position and should not be overridden
+    if (value !== 'K') {
+      if (['A', '4', '7', '10'].includes(value)) {
+        defaultSuit = 'S'; // Picche
+      } else if (['3', '6', '9', 'Q'].includes(value)) {
+        defaultSuit = 'D'; // Quadri
+      } else {
+        defaultSuit = 'H'; // Hearts for 2, 5, 8, J
+      }
+    }
+    
+    touchStartRef.current = { x, y, value, suit: defaultSuit };
+    setCurrentSelection({ value, suit: defaultSuit });
   };
 
   const onSelectionMove = (x: number, y: number) => {
     if (!touchStartRef.current) return;
     const start = touchStartRef.current;
+    
+    // Rule 1: The 4 Kings must not change suit via swipe
+    if (start.value === 'K') return;
+
     const dx = x - start.x;
     const dy = y - start.y;
     const threshold = 40;
@@ -309,6 +328,14 @@ export default function App() {
       onTouchMove={handleScratchMove}
       onTouchEnd={handleScratchEnd}
     >
+      
+      {/* Ready Status Indicators (2px white dots) */}
+      {isModeSelection && (
+        <>
+          <div className="absolute top-4 right-4 w-[3px] h-[3px] bg-white rounded-full z-[100] pointer-events-none" />
+          <div className="absolute bottom-4 left-4 w-[3px] h-[3px] bg-white rounded-full z-[100] pointer-events-none" />
+        </>
+      )}
       
       {/* Background Layer: The Selected Card & Reset Zones */}
       <div className="absolute inset-0 flex items-center justify-center bg-neutral-900 z-0 overflow-hidden pointer-events-none p-4">
